@@ -1,0 +1,8 @@
+*.dll
+*.swp
+*.zip
+/modInfo.json
+*.flv
+*.mtl
+*.mdb
+
