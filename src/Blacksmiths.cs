@@ -21,6 +21,7 @@ namespace ScarabolMods
     private static string RelativeTexturesPath;
     private static string RelativeIconsPath;
     private static string RelativeMeshesPath;
+    private static Recipe anvilRecipe;
     private static Recipe sledgeRecipe;
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.blacksmiths.assemblyload")]
@@ -51,10 +52,10 @@ namespace ScarabolMods
     public static void AfterAddingBaseTypes()
     {
       ItemTypesServer.AddTextureMapping(JOB_ITEM_KEY, new JSONNode()
-        .SetAs("albedo", Path.Combine(RelativeTexturesPath, "anvil"))
-        .SetAs("normal", "neutral")
-        .SetAs("emissive", "neutral")
-        .SetAs("height", "neutral")
+                                        .SetAs("albedo", Path.Combine(RelativeTexturesPath, "anvil"))
+                                        .SetAs("normal", "neutral")
+                                        .SetAs("emissive", "neutral")
+                                        .SetAs("height", "neutral")
       );
       ItemTypes.AddRawType(JOB_ITEM_KEY, new JSONNode(NodeType.Object)
                            .SetAs("npcLimit", 0)
@@ -68,15 +69,14 @@ namespace ScarabolMods
       );
       foreach (string xz in new string[] { "x+", "x-", "z+", "z-" }) {
         ItemTypes.AddRawType(JOB_ITEM_KEY + xz, new JSONNode(NodeType.Object)
-                             .SetAs("parentType", JOB_ITEM_KEY)
-                             .SetAs("mesh", Path.Combine(RelativeMeshesPath, "anvil" + xz + ".obj"))
+                           .SetAs("parentType", JOB_ITEM_KEY)
+                           .SetAs("mesh", Path.Combine(RelativeMeshesPath, "anvil" + xz + ".obj"))
         );
       }
-      ItemTypes.AddRawType(JOB_TOOL_KEY,
-        new JSONNode(NodeType.Object)
-          .SetAs<int>("npcLimit", 1)
-          .SetAs("icon", Path.Combine(RelativeIconsPath, "sledge.png"))
-          .SetAs<bool>("isPlaceable", false)
+      ItemTypes.AddRawType(JOB_TOOL_KEY, new JSONNode(NodeType.Object)
+                           .SetAs("npcLimit", 1)
+                           .SetAs("icon", Path.Combine(RelativeIconsPath, "sledge.png"))
+                           .SetAs("isPlaceable", false)
       );
     }
 
@@ -85,10 +85,9 @@ namespace ScarabolMods
     [ModLoader.ModCallbackProvidesFor("pipliz.apiprovider.registerrecipes")]
     public static void AfterItemTypesDefined()
     {
-      sledgeRecipe = new Recipe(new JSONNode()
-        .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", JOB_TOOL_KEY)))
-        .SetAs("requires", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "ironingot"))));
-      RecipeManager.AddRecipes("pipliz.crafter", new List<Recipe>() { sledgeRecipe });
+      anvilRecipe = new Recipe(new InventoryItem("ironingot", 4), new InventoryItem(JOB_ITEM_KEY, 1));
+      sledgeRecipe = new Recipe(new InventoryItem("ironingot", 1), new InventoryItem(JOB_TOOL_KEY, 1));
+      RecipeManager.AddRecipes("pipliz.crafter", new List<Recipe>() { anvilRecipe, sledgeRecipe });
       List<Recipe> blacksmithRecipes = new List<Recipe>();
       Recipe[] crafterRecipes;
       if (RecipeManager.RecipeStorage.TryGetValue("pipliz.crafter", out crafterRecipes)) {
@@ -116,9 +115,7 @@ namespace ScarabolMods
     public static void AfterWorldLoad()
     {
       // add recipes here, otherwise they're inserted before vanilla recipes in player crafts
-      RecipePlayer.AllRecipes.Add(new Recipe(new JSONNode()
-        .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", JOB_ITEM_KEY)))
-        .SetAs("requires", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "ironingot").SetAs("amount", 4)))));
+      RecipePlayer.AllRecipes.Add(anvilRecipe);
       RecipePlayer.AllRecipes.Add(sledgeRecipe);
     }
   }
