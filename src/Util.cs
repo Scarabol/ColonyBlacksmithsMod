@@ -49,9 +49,9 @@ namespace ScarabolMods
             }
             string val = jsonFromMod.GetAs<string>(entry.Key);
             if (!jsonToPatch.HasChild(realkey)) {
-              Pipliz.Log.Write(string.Format("translation '{0}' => '{1}' added to '{2}/{3}'. This will apply AFTER next restart!!!", realkey, val, locName, locFilename));
+              Pipliz.Log.Write(string.Format("localization '{0}' => '{1}' added to '{2}'. This will apply AFTER next restart!!!", realkey, val, Path.Combine(locName, locFilename)));
             } else if (!jsonToPatch.GetAs<string>(realkey).Equals(val)) {
-              Pipliz.Log.Write(string.Format("translation '{0}' => '{1}' changed in '{2}/{3}'. This will apply AFTER next restart!!!", realkey, val, locName, locFilename));
+              Pipliz.Log.Write(string.Format("localization '{0}' => '{1}' changed in '{2}'. This will apply AFTER next restart!!!", realkey, val, Path.Combine(locName, locFilename)));
             }
             jsonToPatch.SetAs(realkey, val);
           }
@@ -81,6 +81,18 @@ namespace ScarabolMods
         result.Append(part.TrimEnd('/', '\\')).Append(Path.DirectorySeparatorChar);
       }
       return result.ToString().TrimEnd(Path.DirectorySeparatorChar);
+    }
+  }
+
+  public static class TypeHelper
+  {
+    public static string RotatableToBasetype(string typename)
+    {
+      if (typename.EndsWith("x+") || typename.EndsWith("x-") || typename.EndsWith("z+") || typename.EndsWith("z-")) {
+        return typename.Substring(0, typename.Length - 2);
+      } else {
+        return typename;
+      }
     }
   }
 }
