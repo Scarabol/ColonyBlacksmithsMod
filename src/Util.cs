@@ -72,6 +72,41 @@ namespace ScarabolMods
     }
   }
 
+  public static class ModAudioHelper
+  {
+    public static void IntegrateAudio(string audioFilesPath, string namesPrefix, string relativeAudioPath)
+    {
+      try {
+        string[] jsonfiles = Directory.GetFiles(audioFilesPath, "*.json", SearchOption.TopDirectoryOnly);
+        foreach (string jsonfilepath in jsonfiles) {
+          JSONNode jsonAudio;
+          Pipliz.JSON.JSON.Deserialize(jsonfilepath, out jsonAudio, true);
+          string colName;
+          if (jsonAudio.TryGetAs("clipCollectionName", out colName)) {
+            string realColName = namesPrefix + colName;
+            Pipliz.Log.Write(string.Format("Rewriting audio collection name from '{0}' to '{1}'", colName, realColName));
+            jsonAudio.SetAs("clipCollectionName", realColName);
+          }
+          JSONNode jsonFileList;
+          if (jsonAudio.TryGetAs("fileList", out jsonFileList) && jsonFileList.NodeType == NodeType.Array) {
+            foreach (JSONNode fileNode in jsonFileList.LoopArray()) {
+              string audioPath;
+              if (fileNode.TryGetAs("path", out audioPath)) {
+                string realAudioPath = Path.Combine(relativeAudioPath, audioPath);
+                Pipliz.Log.Write(string.Format("Rewriting audio file path from '{0}' to '{1}'", audioPath, realAudioPath));
+                fileNode.SetAs("path", realAudioPath);
+              }
+            }
+          }
+          string jsontargetfilepath = MultiPath.Combine(Path.GetFullPath("gamedata"), "audio", namesPrefix + Path.GetFileName(jsonfilepath));
+          Pipliz.JSON.JSON.Serialize(jsontargetfilepath, jsonAudio);
+        }
+      } catch (DirectoryNotFoundException) {
+//        Pipliz.Log.Write(string.Format("No audio directory found at {0}", audioFilesPath));
+      }
+    }
+  }
+
   public static class MultiPath
   {
     public static string Combine(params string[] pathParts)

@@ -1,0 +1,9 @@
+{
+  "clipCollectionName" : "anvilPlace",
+  "fileList" : [
+    {
+      "path" : "anvilPlace.ogg",
+      "audioGroup" : "BlockEditing"
+    }
+  ]
+}

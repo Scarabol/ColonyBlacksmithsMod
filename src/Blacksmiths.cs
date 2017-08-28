@@ -21,6 +21,7 @@ namespace ScarabolMods
     private static string RelativeTexturesPath;
     private static string RelativeIconsPath;
     private static string RelativeMeshesPath;
+    private static string RelativeAudioPath;
     private static Recipe anvilRecipe;
     private static Recipe sledgeRecipe;
 
@@ -33,6 +34,8 @@ namespace ScarabolMods
       RelativeTexturesPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "materials", "blocks", "albedo", "dummyfile")).MakeRelativeUri(new Uri(MultiPath.Combine(AssetsDirectory, "textures", "albedo"))).OriginalString;
       RelativeIconsPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "icons", "dummyfile")).MakeRelativeUri(new Uri(Path.Combine(AssetsDirectory, "icons"))).OriginalString;
       RelativeMeshesPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "meshes", "dummyfile")).MakeRelativeUri(new Uri(Path.Combine(AssetsDirectory, "meshes"))).OriginalString;
+      RelativeAudioPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "audio", "dummyfile")).MakeRelativeUri(new Uri(Path.Combine(AssetsDirectory, "audio"))).OriginalString;
+      ModAudioHelper.IntegrateAudio(Path.Combine(AssetsDirectory, "audio"), MOD_PREFIX, RelativeAudioPath);
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterStartup, "scarabol.blacksmiths.registercallbacks")]
@@ -58,6 +61,8 @@ namespace ScarabolMods
                                         .SetAs("height", "neutral")
       );
       ItemTypes.AddRawType(JOB_ITEM_KEY, new JSONNode(NodeType.Object)
+                           .SetAs("onPlaceAudio", MOD_PREFIX + "anvilPlace")
+                           .SetAs("onRemoveAudio", "woodDeleteHeavy")
                            .SetAs("npcLimit", 0)
                            .SetAs("icon", Path.Combine(RelativeIconsPath, "anvil.png"))
                            .SetAs("sideall", "SELF")
@@ -129,6 +134,10 @@ namespace ScarabolMods
     public override InventoryItem RecruitementItem { get { return new InventoryItem(ItemTypes.IndexLookup.GetIndex(BlacksmithsModEntries.JOB_TOOL_KEY), 1); } }
 
     public override int MaxRecipeCraftsPerHaul { get { return 5; } }
+
+    protected override void OnRecipeCrafted() {
+      ServerManager.SendAudio(position.Vector, BlacksmithsModEntries.MOD_PREFIX + "jobDone");
+    }
 
     public override List<string> GetCraftingLimitsTriggers ()
     {
