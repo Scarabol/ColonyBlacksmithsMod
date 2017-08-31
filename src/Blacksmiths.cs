@@ -41,7 +41,7 @@ namespace ScarabolMods
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterStartup, "scarabol.blacksmiths.registercallbacks")]
     public static void AfterStartup()
     {
-      Pipliz.Log.Write("Loaded Blacksmiths Mod 1.1 by Scarabol");
+      Pipliz.Log.Write("Loaded Blacksmiths Mod 1.2 by Scarabol");
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterDefiningNPCTypes, "scarabol.blacksmiths.registerjobs")]
