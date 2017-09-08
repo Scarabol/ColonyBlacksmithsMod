@@ -79,9 +79,9 @@ namespace ScarabolMods
         );
       }
       ItemTypes.AddRawType (JOB_TOOL_KEY, new JSONNode (NodeType.Object)
-        .SetAs ("npcLimit", 1)
         .SetAs ("icon", Path.Combine (RelativeIconsPath, "sledge.png"))
         .SetAs ("isPlaceable", false)
+        .SetAs ("npcLimit", 1)
       );
     }
 
